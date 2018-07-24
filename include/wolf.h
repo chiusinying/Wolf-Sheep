@@ -8,7 +8,8 @@ class Wolf : public Creature {
   Wolf(int x, int y);
   ~Wolf() = default;
 
-  virtual TYPE GetType() const;
+  virtual enum Creature::TYPE GetType() const;
+  virtual void Move(Game* game);
   virtual void Breed(Game* game);
   virtual void Eat(int x, int y, Game* game);
   virtual bool Starve(Game* game);

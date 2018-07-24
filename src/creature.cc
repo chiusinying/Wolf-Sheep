@@ -1,19 +1,29 @@
-#include "include/creature.h"
+#include "creature.h"
 
-Creature::Creature(int x, int y) {}
-
-int Creature::GetX() const { return this->x_; }
-
-int Creature::GetY() const { return this->y_; }
-
-void Creature::SetX(int x) { this->x_ = x; }
-
-void Creature::SetY(int y) { this->y_ = y; }
-
-void Creature::Die(Game* game) {
-  game->Remove(this->x_, this->y_);
+Creature::Creature(int x, int y, Creature::TYPE type) {
+  this->x_ = x;
+  this->y_ = y;
+  this->type_ = type;
+  this->starve_checker_ = 0;
+  this->breed_checker_ = 0;
+  this->eat_ = 0;
 }
 
-void Creature::Move(int direction, Game* game) {
-  
+void Creature::Die(Game* game) { game->Remove(this->x_, this->y_); }
+
+void Creature::UpdateStarveChecker() {
+  if (this->starve_checker_ < 3) {
+    this->starve_checker_++;
+  } else {
+    this->starve_checker_ = 0;
+    this->eat_ = 0;
+  }
+}
+
+void Creature::UpdateBreedChecker() {
+  if (this->breed_checker_ < 8) {
+    this->breed_checker_++;
+  } else {
+    this->breed_checker_ = 0;
+  }
 }

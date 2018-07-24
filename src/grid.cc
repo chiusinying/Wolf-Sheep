@@ -1,4 +1,4 @@
-#include "include/grid.h"
+#include "grid.h"
 
 Grid::Grid() : creature_(nullptr), type_(0) {}
 
@@ -14,6 +14,8 @@ Grid::~Grid() {
 }
 
 int Grid::GetType() const { return this->type_; }
+
+Creature* Grid::GetCreature() const { return this->creature_; }
 
 void Grid::SetType(int type) { this->type_ = type; }
 

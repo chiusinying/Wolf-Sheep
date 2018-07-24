@@ -1,4 +1,4 @@
-#include "include/game.h"
+#include "game.h"
 
 // return random integer in [1, upper]
 int random(int upper) { return rand() % upper + 1; }
@@ -62,17 +62,29 @@ Game::~Game() {
 
 Grid* Game::GetGrid(int x, int y) const { return &(this->map_[x][y]); }
 
-void Game::Add(int x, int y, Creature::TYPE type) {
+void Game::Add(int x, int y, enum Creature::TYPE type) {
   switch (type) {
-    case Creature::TYPE::SHEEP:
+    case Creature::SHEEP:
       this->map_[x][y].SetCreature(new Sheep(x, y));
+      this->map_[x][y].SetType(Creature::SHEEP);
       break;
-    case Creature::TYPE::WOLF:
+    case Creature::WOLF:
       this->map_[x][y].SetCreature(new Wolf(x, y));
+      this->map_[x][y].SetType(Creature::WOLF);
       break;
   }
 
   this->UpdateAmount(type, 1);
+}
+
+void Game::Exchange(int x, int y, int newX, int newY) {
+  Grid* oldGrid = this->GetGrid(x, y);
+  Grid* newGrid = this->GetGrid(newX, newY);
+
+  newGrid->SetCreature(oldGrid->GetCreature());
+  oldGrid->SetCreature(nullptr);
+  newGrid->SetType(oldGrid->GetType());
+  oldGrid->SetType(Grid::GRASS);
 }
 
 void Game::Remove(int x, int y) {
@@ -89,26 +101,55 @@ void Game::Remove(int x, int y) {
 
 void Game::UpdateAmount(Creature::TYPE type, int delta) {
   switch (type) {
-    case Creature::TYPE::SHEEP:
+    case Creature::SHEEP:
       this->sheep_amount_ += delta;
       break;
-    case Creature::TYPE::WOLF:
+    case Creature::WOLF:
       this->wolf_amount_ += delta;
       break;
   }
 }
 
-void Game::Refresh() {
+void Game::Tick() {
+  this->day_++;
+
   for (int i = 1; i <= this->width_; i++) {
     for (int j = 1; j <= this->width_; j++) {
       Creature* creature = this->map_[i][j].GetCreature();
 
-      if (creature == nullptr) {
+      if (creature == nullptr || creature->GetType() != Creature::WOLF) {
         continue;
       }
 
+      if (creature->Starve(this)) {
+        creature->Die(this);
+        continue;
+      }
+
+      creature->Move(this);
+      creature->Breed(this);
+      creature->UpdateStarveChecker();
+      creature->UpdateBreedChecker();
     }
   }
 
-  this->day_++;
+  for (int i = 1; i <= this->width_; i++) {
+    for (int j = 1; j <= this->width_; j++) {
+      Creature* creature = this->map_[i][j].GetCreature();
+
+      if (creature == nullptr || creature->GetType() != Creature::SHEEP) {
+        continue;
+      }
+
+      if (creature->Starve(this)) {
+        creature->Die(this);
+        continue;
+      }
+
+      creature->Move(this);
+      creature->Breed(this);
+      creature->UpdateStarveChecker();
+      creature->UpdateBreedChecker();
+    }
+  }
 }

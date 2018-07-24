@@ -5,7 +5,7 @@
 
 class Grid {
  public:
-  enum TYPE { WALL, GRASS };
+  enum TYPE { WALL = 0, GRASS = 1 };
   Grid();
   ~Grid();
 

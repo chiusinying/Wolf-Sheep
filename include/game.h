@@ -15,11 +15,12 @@ class Game {
 
   Grid* GetGrid(int x, int y) const;
 
-  void Add(int x, int y, Creature::TYPE type);
+  void Add(int x, int y, enum Creature::TYPE type);
+  void Exchange(int x, int y, int newX, int newY);
   void Remove(int x, int y);
   void UpdateAmount(Creature::TYPE type, int delta);
   void Display() const;
-  void Refresh();
+  void Tick();
 
  private:
   Grid** map_;
